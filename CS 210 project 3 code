@@ -1,0 +1,121 @@
+#include <iostream>
+#include <fstream>
+#include <map>
+#include <string>
+
+using namespace std;
+
+// Class for tracking
+class GroceryTracker {
+private:
+    map<string, int> itemFrequency; // stores item + count
+
+public:
+    // Loads data from input file
+    void LoadData(string filename) {
+        ifstream inFS(filename);
+        string item;
+
+        if (!inFS.is_open()) {
+            cout << "Error opening file." << endl;
+            return;
+        }
+
+        // Reads each item and count frequency
+        while (inFS >> item) {
+            itemFrequency[item]++;
+        }
+
+        inFS.close();
+
+        // Creates backup file automatically
+        SaveToFile("frequency.dat");
+    }
+
+    // Saves frequency data to file
+    void SaveToFile(string filename) {
+        ofstream outFS(filename);
+
+        for (auto& pair : itemFrequency) {
+            outFS << pair.first << " " << pair.second << endl;
+        }
+
+        outFS.close();
+    }
+
+    // Option 1: searching for a specific item
+    void GetItemFrequency(string item) {
+        if (itemFrequency.count(item)) {
+            cout << item << " purchased " << itemFrequency[item] << " times." << endl;
+        } else {
+            cout << item << " was not found." << endl;
+        }
+    }
+
+    // Option 2: print all the frequencies
+    void PrintAllFrequencies() {
+        for (auto& pair : itemFrequency) {
+            cout << pair.first << " " << pair.second << endl;
+        }
+    }
+
+    // Option 3: printing a histogram
+    void PrintHistogram() {
+        for (auto& pair : itemFrequency) {
+            cout << pair.first << " ";
+            for (int i = 0; i < pair.second; i++) {
+                cout << "*";
+            }
+            cout << endl;
+        }
+    }
+};
+
+// Function to display a menu
+void DisplayMenu() {
+    cout << "\n===== Corner Grocer Menu =====" << endl;
+    cout << "1. Search for item frequency" << endl;
+    cout << "2. Display all item frequencies" << endl;
+    cout << "3. Display histogram" << endl;
+    cout << "4. Exit" << endl;
+    cout << "Select an option: ";
+}
+
+int main() {
+    GroceryTracker tracker;
+    tracker.LoadData("CS210_Project_Three_Input_File.txt");
+
+    int choice;
+    string item;
+
+    do {
+        DisplayMenu();
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            cout << "Enter item to search: ";
+            cin >> item;
+            tracker.GetItemFrequency(item);
+            break;
+
+        case 2:
+            tracker.PrintAllFrequencies();
+            break;
+
+        case 3:
+            tracker.PrintHistogram();
+            break;
+
+        case 4:
+            cout << "Exiting program..." << endl;
+            break;
+
+        default:
+            cout << "Invalid input. Try again." << endl;
+        }
+
+    } while (choice != 4);
+
+    return 0;
+}
